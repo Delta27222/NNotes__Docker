@@ -34,16 +34,17 @@ jobs:
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
-    - name: Build Docker Image
-      env:
-        NEW_VERSION: ${{ steps.version.outputs.version }}
-      run: |
-        docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm64/v8  -t delta27222/nnotes_docker:$NEW_VERSION ./NNotes/
-        docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm64/v8  -t delta27222/nnotes_docker:latest ./NNotes/
+    - name: Configure Docker buildx (optional)
+      uses: docker/setup-buildx-action@v1  # Optional, comment out if buildx is already configured
 
-    - name: Push Docker Image
-      env:
-        NEW_VERSION: ${{ steps.version.outputs.version }}
-      run: |
-        docker push delta27222/nnotes_docker:$NEW_VERSION
-        docker push delta27222/nnotes_docker:latest
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v3
+      with:
+        push: true
+        tags: |
+          delta27222/nnotes_docker:${{ steps.version.outputs.version }}
+          delta27222/nnotes_docker:latest
+        platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm64/v8
+        file: ./NNotes/Dockerfile  # Update path to your Dockerfile
+
+  
