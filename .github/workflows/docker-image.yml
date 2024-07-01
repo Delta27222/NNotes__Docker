@@ -35,6 +35,6 @@ jobs:
         context: .
         platforms: linux/amd64,linux/arm64
         push: true
-        tags: delta27222/nnotes_docker:delta27222/nnotes_docker:$NEW_VERSION && delta27222/nnotes_docker:latest
+        tags: delta27222/nnotes_docker:delta27222/nnotes_docker:$NEW_VERSION
         cache-from: type=gha
         cache-to: type=gha,mode=max
