@@ -25,3 +25,4 @@ ENV NODE_ENV=production
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./
 CMD [ "npm", "start" ]
+ 
