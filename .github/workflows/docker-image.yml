@@ -38,12 +38,12 @@ jobs:
       env:
         NEW_VERSION: ${{ steps.version.outputs.version }}
       run: |
-        docker build -t delta27222/delta27222/nnotes_frontend:$NEW_VERSION ./NNotes/
-        docker build -t delta27222/delta27222/nnotes_frontend:latest ./NNotes/
+        docker build -t delta27222/notes_frontend:$NEW_VERSION ./NNotes/
+        docker build -t delta27222/nnotes_frontend:latest ./NNotes/
 
     - name: Push Docker Image
       env:
         NEW_VERSION: ${{ steps.version.outputs.version }}
       run: |
-        docker push delta27222/delta27222/nnotes_frontend:$NEW_VERSION
-        docker push delta27222/delta27222/nnotes_frontend:latest
+        docker push delta27222/nnotes_frontend:$NEW_VERSION
+        docker push delta27222/nnotes_frontend:latest
