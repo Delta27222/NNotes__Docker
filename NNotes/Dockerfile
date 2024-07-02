@@ -1,28 +1,19 @@
-# Stage 1: Install dependencies (development)
-FROM node:19.2-alpine3.16 AS dev-deps
-WORKDIR /app
-COPY package.json ./
-RUN yarn install --frozen-lockfile
+FROM node:18-alpine AS build
 
-# Stage 2: Build the application (production)
-FROM node:19.2-alpine3.16 AS builder
 WORKDIR /app
-COPY --from=dev-deps /app/node_modules ./node_modules
+COPY package*.json ./
+RUN npm ci
 COPY . .
-RUN yarn build
+RUN npm run build
 
-# Stage 3: Install production dependencies
-FROM node:19.2-alpine3.16 AS prod-deps
-WORKDIR /app
-COPY package.json ./
-RUN yarn install --prod --frozen-lockfile
+FROM node:18-alpine AS runtime
 
-# Stage 4: Final production image
-FROM node:19.2-alpine3.16 AS prod
 WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
+
 EXPOSE 3000
-ENV NODE_ENV=production
-COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./
-CMD [ "npm", "start" ]
- 
+USER node
+CMD ["npm", "start"]
