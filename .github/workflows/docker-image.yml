@@ -23,18 +23,27 @@ jobs:
       with:
         major_pattern: "major:"
         minor_pattern: "feat:"
-        format: "${major}.${minor}.${increment}"
+        format: "${major}.${minor}.${patch}-prerelease${increment}"
       id: version
 
-    - uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USER }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-    - uses: docker/build-push-action@v5
-      with:
-        context: .
-        platforms: linux/amd64,linux/arm64
-        push: true
-        tags: delta27222/nnotes_docker:delta27222/nnotes_docker:$NEW_VERSION
-        # cache-from: type=gha
-        # cache-to: type=gha,mode=max
+    - name: Docker Login
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+    - name: Build Docker Image
+      env:
+        NEW_VERSION: ${{ steps.version.outputs.version }}
+      run: |
+        docker build -t delta27222/nnotes_docker:$NEW_VERSION ./NNotes/
+        docker build -t delta27222/nnotes_docker:latest ./NNotes/
+
+    - name: Push Docker Image
+      env:
+        NEW_VERSION: ${{ steps.version.outputs.version }}
+      run: |
+        docker push delta27222/nnotes_docker:$NEW_VERSION
+        docker push delta27222/nnotes_docker:latest
